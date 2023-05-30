@@ -1,0 +1,84 @@
+\documentclass{article}
+
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{url}
+
+%%%%%%%%%%%%%%%% Lengths %%%%%%%%%%%%%%%%
+\setlength{\textwidth}{15.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\oddsidemargin}{0.5cm}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%% Main part %%%%%%%%%%%%%%%%
+\section{Décomposition de Cholesky}
+\label{sec:decomposition_cholesky}
+
+La décomposition de Cholesky est une méthode permettant de simplifier la résolution d'un système linéaire en le ramenant à un système triangulaire. Nous allons dans cette partie nous intéresser à sa mise en œuvre.
+\vskip 1mm ~
+
+Soit $A$ une matrice définie positive. La décomposition de Cholesky permet d'écrire cette matrice telle que $A = T\cdot T^t$ où $T$ est une matrice triangulaire inférieure. L'obtention des coefficients de $T$ se fait à l'aide des équations~\ref{eq:cholesky_ii} et~\ref{eq:cholesky_ji}.
+
+\begin{equation}
+  t_{i,i}^2 = a_{i,i} - \sum_{k=1}^{i-1}t_{i,k}^2
+  \label{eq:cholesky_ii}
+\end{equation}
+
+\begin{equation}
+  t_{j,i} = \frac{a_{i,j}-\sum_{k=1}^{i-1}t_{i,k}t_{j,k}}{t_{i,i}} \qquad\forall j\geq i
+  \label{eq:cholesky_ji}
+\end{equation}
+
+Dans un premier temps, nous avons réalisé la factorisation complète à l'aide d'une fonction \verb|decomp_cholesky(A)| dans laquelle nous faisons le calcul des coefficients de $T$ colonnes après colonnes.
+
+Nous avons testé le bon fonctionnement de cette fonction sur les matrices données en équation~\ref{eq:cholesky_tests}. Nous y vérifions que la décomposition est bien réalisée (à l'aide de la fonction \verb|linalg.cholesky| du module \verb|NumPy|\footnote{\url{https://numpy.org/doc/stable/reference/generated/numpy.linalg.cholesky.html}}) et la validité des égalités $A = T_A\cdot T_A^t$ et $B = T_B\cdot T_B^t$.
+
+\begin{equation}
+  A = 
+  \begin{bmatrix}
+    2 & -1 & 0\\
+    -1 & 2 & -1\\
+    0 & -1 & 2
+  \end{bmatrix}
+  \qquad
+  B = 
+  \begin{bmatrix}
+    2000 & -577 & 0\\
+    -577 & 2000 & -577\\
+    0 & -577 & 2000
+  \end{bmatrix}
+  \label{eq:cholesky_tests}
+\end{equation}
+
+La réalisation de la décomposition de Cholesky est de complexité asymptotique $O\Big(\dfrac{n^3}{3}\Big)$. Le calcul de cette complexité est détaillé en équation~\ref{eq:cholesky_complexite}.
+
+La méthode de Cholesky est donc plus avantageuse que la méthode de Gauss, mais les conditions d'applications (la matrice doit être définie positive) sont plus restreintes.
+
+
+\begin{equation}
+  12 = 12 +0
+  \label{eq:cholesky_complexite}
+\end{equation}
+
+Afin de résoudre un système linéaire dense dans le cadre d'application de la factorisation de Cholesky, il faut ajouter au coût de la décomposition celui de la résolution du système triangulaire. Ce coût correspond à une complexité asymptique de $O(n^2)$.
+
+Ainsi, le coût de résolution d'un système linéaire dense est ici de $\dfrac{n^3}{3} + O(n^2)$.
+
+\vskip 1mm ~
+
+Dans le cas où matrice $A$ est creuse, il est possible de réaliser une factorisation de Cholesky moins coûteuse : on parle de la factorisation incomplète de Cholesky.
+
+Afin de réaliser cette factorisation, nous avons tout d'abord conçu une fonction \verb|spd_matrix(n,probabilite)| qui génère une matrice symétrique définie positive creuse avec un nombre de termes extra-diagonaux non nuls réglable par le paramètre \verb|probabilite|.
+
+Nous réalisons la factorisation incomplète de Cholesky grâce à la fonction \verb|incomplete_decomp_cholesky(A)| : elle reprend le principe de la fonction permettant la décomposition de Cholesky mais ne calcule pas les éléments $t_{i,j}$ lorsque $A_{i,j}$ est nulle.
+
+Afin de vérifier le bon fonctionnement de ces fonctions, nous vérifions d'abord que la première fonction renvoie bien une matrice symétrique définie positive. Pour la seconde, on vérifie que la décomposition de Cholesky est correctement réalisée sur des matrices générées par la première fonction. [parler du caractère creux??]
+
+[complexité]
+
+Nous avons évalué la qualité du préconditionneur $T\cdot T^t$ pour deux méthodes de factorisations, $T$ étant la matrice obtenue par la décomposition de Cholesky. Pour cela, nous avons regardé si $cond((T\cdot T^t)^{-1}\cdot A) < cond(A)$ où $A$ est une matrice symétrique définie positive creuse générée aléatoirement.
+
+[parler des résultats]
+\end{document}
